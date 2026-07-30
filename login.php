@@ -21,7 +21,7 @@ if (isset($_POST['login'])) {
     if (mysqli_num_rows($query) == 1) {
         $data = mysqli_fetch_assoc($query);
         $_SESSION['user'] = $data['username'];
-        $_SESSION['user_id'] = $data['id']; // <--- Simpan ID User untuk Query Pesanan
+        $_SESSION['user_id'] = $data['id'];
         $_SESSION['role'] = $data['role'];
         header("Location: index.php");
         exit;
@@ -34,25 +34,136 @@ if (isset($_POST['login'])) {
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Boneka Store</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background: #2b4a8a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .login-card { background: #fff; width: 100%; max-width: 400px; padding: 40px 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; }
-        .login-card img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; border-radius: 50%; }
-        .login-card h1 { color: #1976d2; font-size: 28px; margin-bottom: 5px; font-weight: 700; }
-        .login-card p.subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
-        .form-group { text-align: left; margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; }
-        .form-group input { width: 100%; padding: 12px 15px; background: #f1f5f9; border: 1px solid transparent; border-radius: 10px; font-size: 15px; transition: 0.3s; }
-        .form-group input:focus { outline: none; background: #fff; border: 1px solid #1976d2; box-shadow: 0 0 0 3px rgba(25,118,210,0.1); }
-        .btn-login { width: 100%; padding: 14px; background: #1976d2; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .btn-login:hover { background: #1565c0; }
-        .error { color: #d32f2f; background: #ffebee; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
-        .register-link { margin-top: 20px; font-size: 14px; color: #666; }
-        .register-link a { color: #1976d2; text-decoration: none; font-weight: 600; }
-        .register-link a:hover { text-decoration: underline; }
-        .footer-copyright { margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.7); text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Background Ungu Gradasi */
+        body { 
+            background: linear-gradient(135deg, #1a0a2e, #2d1b4e); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        
+        /* Kartu Login Ungu Gelap */
+        .login-card { 
+            background: #2c1a4d; 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 40px 35px; 
+            border-radius: 15px; 
+            border: 1px solid #9b59b6; 
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.3); 
+            text-align: center; 
+        }
+        
+        /* Logo & Judul */
+        .login-card img { 
+            width: 70px; 
+            height: 70px; 
+            object-fit: contain; 
+            margin-bottom: 10px; 
+            border-radius: 50%; 
+            border: 2px solid #d7bde2;
+        }
+        .login-card h1 { 
+            color: #d7bde2; 
+            font-size: 28px; 
+            margin-bottom: 5px; 
+            font-weight: 700; 
+        }
+        .login-card p.subtitle { 
+            color: #d2b4de; 
+            font-size: 14px; 
+            margin-bottom: 25px; 
+        }
+        
+        /* Form Input */
+        .form-group { 
+            text-align: left; 
+            margin-bottom: 20px; 
+        }
+        .form-group label { 
+            display: block; 
+            font-weight: 600; 
+            font-size: 14px; 
+            color: #d7bde2; 
+            margin-bottom: 8px; 
+        }
+        .form-group input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            background: #1f0f3a; 
+            border: 1px solid #9b59b6; 
+            border-radius: 8px; 
+            font-size: 15px; 
+            color: #f0e6ff; 
+            transition: 0.3s; 
+            outline: none;
+        }
+        .form-group input::placeholder { color: #7a5a8a; }
+        .form-group input:focus { 
+            border-color: #d7bde2; 
+            box-shadow: 0 0 0 3px rgba(215, 189, 226, 0.1); 
+        }
+        
+        /* Tombol Login Ungu */
+        .btn-login { 
+            width: 100%; 
+            padding: 14px; 
+            background: #9b59b6; 
+            color: white; 
+            border: none; 
+            border-radius: 25px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin-top: 10px;
+        }
+        .btn-login:hover { 
+            background: #d7bde2; 
+            color: #1a0a2e; 
+        }
+        
+        /* Pesan Error */
+        .error { 
+            color: #e74c3c; 
+            background: #1f0f3a; 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            font-size: 14px; 
+            border: 1px solid #e74c3c;
+        }
+        
+        /* Link Daftar */
+        .register-link { 
+            margin-top: 20px; 
+            font-size: 14px; 
+            color: #d2b4de; 
+        }
+        .register-link a { 
+            color: #d7bde2; 
+            text-decoration: none; 
+            font-weight: 600; 
+        }
+        .register-link a:hover { 
+            color: #9b59b6; 
+            text-decoration: underline; 
+        }
+        
+        /* Footer Copyright */
+        .footer-copyright { 
+            margin-top: 20px; 
+            font-size: 12px; 
+            color: rgba(255, 255, 255, 0.4); 
+            text-align: center; 
+        }
     </style>
 </head>
 <body>
