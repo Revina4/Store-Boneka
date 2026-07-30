@@ -7,6 +7,9 @@ if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit;
 }
+
+// Hitung jumlah item di keranjang (untuk badge merah)
+$cart_count = isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0;
 ?>
 <!DOCTYPE html>
 <html>
@@ -29,12 +32,30 @@ if (!isset($_SESSION['user'])) {
         .card h3 { color: #d7bde2; margin: 15px 0 5px; }
         .card h2 { color: #f1c40f; margin: 5px 0; }
         .card small { color: #bdc3c7; }
-        button { margin-top: 15px; padding: 10px 25px; border: none; background: #9b59b6; color: white; border-radius: 25px; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #d7bde2; color: #1a0a2e; }
+        button { padding: 10px 20px; border: none; border-radius: 25px; cursor: pointer; font-size: 14px; transition: 0.3s; width: 100%; }
+        .btn-beli { background: #f1c40f; color: black; }
+        .btn-beli:hover { background: #d4ac0d; }
+        .btn-cart { background: #9b59b6; color: white; }
+        .btn-cart:hover { background: #d7bde2; color: #1a0a2e; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        
+        .search { display: flex; align-items: center; gap: 10px; }
         .search input { padding: 8px; border-radius: 20px 0 0 20px; border: 1px solid #9b59b6; background: #1f0f3a; color: white; outline: none; }
         .search input[type="submit"] { border-radius: 0 20px 20px 0; background: #9b59b6; border: 1px solid #9b59b6; color: white; cursor: pointer; padding: 8px 15px; }
         .logo-text { font-weight: bold; font-size: 18px; color: #d7bde2; }
         .empty-msg { text-align: center; color: #d2b4de; padding: 30px; background: #2c1a4d; border-radius: 15px; border: 1px solid #9b59b6; }
+
+        /* Ikon Keranjang */
+        .cart-icon-container { position: relative; display: inline-flex; align-items: center; }
+        .cart-icon-container a { color: #d7bde2; text-decoration: none; font-size: 22px; transition: 0.3s; }
+        .cart-icon-container a:hover { color: #9b59b6; }
+        .cart-badge { 
+            position: absolute; top: -5px; right: -8px; 
+            background: #e74c3c; color: white; 
+            font-size: 10px; font-weight: bold; 
+            border-radius: 50%; width: 18px; height: 18px; 
+            display: flex; justify-content: center; align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -50,7 +71,7 @@ if (!isset($_SESSION['user'])) {
         </td>
     </tr>
 
-    <!-- BARIS 2: Menu Dinamis -->
+    <!-- BARIS 2: Menu Dinamis + Keranjang + Search -->
     <tr class="baris2">
         <td>
             <div class="cell-flex">
@@ -58,6 +79,7 @@ if (!isset($_SESSION['user'])) {
                     <img src="uploads/logo2.jpg" alt="Logo" width="60" style="border-radius:50%;">
                     <span class="logo-text">Boneka Store</span>
                 </div>
+                
                 <div class="menu">
                     <a href="index.php">Home</a> |
                     <a href="profil.php">Profil</a> |
@@ -73,7 +95,13 @@ if (!isset($_SESSION['user'])) {
                     
                     <a href="logout.php">Logout</a>
                 </div>
+
+                <!-- Search & Keranjang -->
                 <div class="search">
+                    <div class="cart-icon-container">
+                        <a href="keranjang.php">🛒</a>
+                        <span class="cart-badge"><?= $cart_count; ?></span>
+                    </div>
                     <form action="cari.php" method="get">
                         <input type="text" name="q" placeholder="Cari boneka...">
                         <input type="submit" value="Cari">
@@ -102,9 +130,15 @@ if (!isset($_SESSION['user'])) {
                             <h3><?= htmlspecialchars($row['nama_barang']); ?></h3>
                             <h2>Rp <?= number_format($row['harga'], 0, ',', '.'); ?></h2>
                             <p><?= htmlspecialchars(substr($row['deskripsi'], 0, 80)); ?>...</p>
-                            <a href="beli.php?id=<?= urlencode($row['id_barang']); ?>">
-                                <button>BELI</button>
-                            </a>
+                            
+                            <div class="btn-group">
+                                <a href="beli.php?id=<?= urlencode($row['id_barang']); ?>">
+                                    <button class="btn-beli">⚡ Beli Sekarang</button>
+                                </a>
+                                <a href="tambah_keranjang.php?id=<?= urlencode($row['id_barang']); ?>">
+                                    <button class="btn-cart">🛒 Masukkan Keranjang</button>
+                                </a>
+                            </div>
                         </div>
                 <?php
                     }
